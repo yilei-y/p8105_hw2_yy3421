@@ -8,6 +8,9 @@ library(tidyverse)
 library(readxl)
 ```
 
+## Problem 1:
+
+Clean up the pols-month csv:
 ```{r}
 month_df = 
   tibble(
@@ -23,5 +26,15 @@ pols =
     president = recode(prez_gop, "0" = "dem", "1" = "gop", "2" = "gop")) |>
   left_join(x = _, y = month_df) |> 
   select(year, month, everything(), -day, -starts_with("prez")) 
+```
+
+Clean up the snp.csv
+```{r}
+snp = 
+  read_csv("data/snp.csv") |> 
+  separate(date, into = c("month", "day", "year"), convert = TRUE) |> 
+  arrange(year, month) |> 
+  mutate(month = month.name[month]) |> 
+  select(year, month, close)
 ```
 
