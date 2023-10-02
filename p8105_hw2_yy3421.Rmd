@@ -38,3 +38,17 @@ snp =
   select(year, month, close)
 ```
 
+Clean up the unemployment.csv
+```{r}
+unemployment = 
+  read_csv("data/unemployment.csv") |> 
+  rename(year = Year) |> 
+  pivot_longer(
+    Jan:Dec,
+    names_to = "month_abb",
+    values_to = "unemployment"
+  ) |> 
+  left_join(x=_, y = month_df) |> 
+  select(year, month, unemployment)
+```
+
