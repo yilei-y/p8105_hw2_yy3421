@@ -38,7 +38,7 @@ snp =
   select(year, month, close)
 ```
 
-Clean up the unemployment.csv
+Clean up the unemployment.csv:
 ```{r}
 unemployment = 
   read_csv("data/unemployment.csv") |> 
@@ -50,5 +50,15 @@ unemployment =
   ) |> 
   left_join(x=_, y = month_df) |> 
   select(year, month, unemployment)
+```
+
+Merging the three data frames:
+
+```{r}
+data_problem1 = 
+  left_join(pols, snp) |> 
+  left_join(x = _, y = unemployment)
+
+str(data_problem1)
 ```
 
