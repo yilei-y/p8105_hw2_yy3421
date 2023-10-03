@@ -149,7 +149,7 @@ mci_baseline_effective =
   filter(current_age < age_at_onset | is.na(age_at_onset))
 ```
 
-Based on the Baseline dataset, there are `r nrow(mci_baseline_effective)` participants recruited for this study.
+Based on the Baseline dataset, there are **`r nrow(mci_baseline)`** participants recruited for this study. Among these participants, **`r mci_baseline_effective |>  filter(current_age < age_at_onset) |> nrow()`** develop MCI. The average baseline age is `r mci_baseline |> pull(current_age) |> mean() |> round(2)` years old. Among the female participants in this study, `r mci_baseline |> filter(sex == "female", apoe4 == "apoe4_carrier") |> nrow()/nrow(mci_baseline)*100`% are APOE4 carriers.
 
 Import and clean amyloid dataset:
 ```{r}
