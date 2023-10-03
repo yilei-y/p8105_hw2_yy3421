@@ -65,3 +65,39 @@ str(data_problem1)
 Description:
 
 In the pols-month csv, there are `r nrow(pols)` observations and `r ncol(pols)` variables and tells us about the party affiliation for governors and senators of the time period from `r range(pols$year)[1]` to `r range(pols$year)[2]`. It also presents data of democrat or republican status of the sitting president. The `snp` data has `r nrow(snp)` observations and `r ncol(snp)` variables from years `r range(snp$year)[1]` to `r range(snp$year)[2]`. The `unemployment` data has `r nrow(unemployment)` observations and `r ncol(unemployment)` variables ranging from years `r range(unemployment$year)[1]` to `r range(unemployment$year)[2]`. 
+
+## Problem 2:
+```{r}
+mr_trash_wheel = 
+  read_excel("data/202309 Trash Wheel Collection Data.xlsx",
+             sheet = "Mr. Trash Wheel",
+             range = "A2:N549"
+             ) |> 
+  janitor::clean_names() |> 
+  mutate(
+    homes_powered = weight_tons * 500 / 30
+  )
+
+prof_trash_wheel =
+  read_excel("data/202309 Trash Wheel Collection Data.xlsx",
+             sheet = "Professor Trash Wheel",
+             range = "A2:M108"
+             ) |> 
+  janitor::clean_names() |> 
+  mutate(
+    homes_powered = weight_tons * 500 / 30
+      )
+
+gwy_trash_wheel = 
+    read_excel("data/202309 Trash Wheel Collection Data.xlsx",
+             sheet = "Gwynnda Trash Wheel",
+             range = "A2:L157"
+             ) |> 
+  janitor::clean_names() |> 
+  mutate(
+    homes_powered = weight_tons * 500 / 30
+      )
+
+```
+
+Combining the three datasets:
