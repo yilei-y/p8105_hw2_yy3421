@@ -71,7 +71,7 @@ In the pols-month csv, there are `r nrow(pols)` observations and `r ncol(pols)` 
 mr_trash_wheel = 
   read_excel("data/202309 Trash Wheel Collection Data.xlsx",
              sheet = "Mr. Trash Wheel",
-             range = "A2:N549"
+             range = "A2:N586"
              ) |> 
   janitor::clean_names() |> 
   mutate(
@@ -149,13 +149,36 @@ mci_baseline_effective =
   filter(current_age < age_at_onset | is.na(age_at_onset))
 ```
 
-Based on the Baseline dataset, there are **`r nrow(mci_baseline)`** participants recruited for this study. Among these participants, **`r mci_baseline_effective |>  filter(current_age < age_at_onset) |> nrow()`** develop MCI. The average baseline age is `r mci_baseline |> pull(current_age) |> mean() |> round(2)` years old. Among the female participants in this study, `r mci_baseline |> filter(sex == "female", apoe4 == "apoe4_carrier") |> nrow()/nrow(mci_baseline)*100`% are APOE4 carriers.
+```{r}
+mci_developed =
+  mci_baseline_effective |> 
+  filter(!(current_age > age_at_onset |is.na(age_at_onset)))
+```
+
+
+Based on the `mci_baseline` dataset, there are **`r nrow(mci_baseline_effective)`** participants recruited for this study. The current_age variable tells us the age of the participant at the study baseline and the age_at_onset variables tells us the participant's age at the onset of MCI. Data on whether the partcipant is an APOE4 carrier or not is also included in the `mci_baseline` dataset. Among these participants, **`r mci_baseline_effective |> filter(!(is.na(age_at_onset))) |>  nrow()`** develop MCI. The average baseline age is `r mci_baseline_effective |> pull(current_age) |> mean() |> round(2)` years old. Among the female participants in this study, `r filter (mci_baseline_effective, sex == "female", apoe4 == "apoe4_carrier") |> nrow()/nrow(filter(mci_baseline_effective, sex == "female"))*100`% are APOE4 carriers.
 
 Import and clean amyloid dataset:
 ```{r}
-mci_anyloid = 
+mci_amyloid = 
   read_csv("data/data_mci/mci_amyloid.csv",
-           skip = 1) |> 
-  janitor::clean_names() 
+           skip =1) |> 
+  janitor::clean_names() |> 
+  rename(
+    id = study_id,
+  ) |> 
+  pivot_longer(
+    time_2:time_8,
+    names_to = "time_of_data_collected",
+    values_to = "time"
+  ) 
 ```
 
+```{r}
+mci = 
+  inner_join(
+    mci_developed, mci_amyloid, by = "id"
+  )
+```
+
+Based on the two datasets, there are `r mci |> distinct(id) |> nrow()` participants who appear in both datasets. In the `mci` dataset, participants who appear in both datasets are presented with their age, sex, aducaiton, and apoe4 status. Furthermore, each time when the bio-marker is measured is presented under the time variable and the specific time frame which each data was collected is labeled under the time_of_data_collected variable. 
