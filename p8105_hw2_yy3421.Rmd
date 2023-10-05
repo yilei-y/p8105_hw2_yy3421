@@ -157,13 +157,6 @@ mci_baseline_effective =
   filter(current_age < age_at_onset | is.na(age_at_onset))
 ```
 
-```{r}
-mci_developed =
-  mci_baseline_effective |> 
-  filter(!(current_age > age_at_onset |is.na(age_at_onset)))
-```
-
-
 Based on the `mci_baseline` dataset, there are **`r nrow(mci_baseline_effective)`** participants recruited for this study. The current_age variable tells us the age of the participant at the study baseline and the age_at_onset variables tells us the participant's age at the onset of MCI. Data on whether the partcipant is an APOE4 carrier or not is also included in the `mci_baseline` dataset. Among these participants, **`r mci_baseline_effective |> filter(!(is.na(age_at_onset))) |>  nrow()`** develop MCI. The average baseline age is `r mci_baseline_effective |> pull(current_age) |> mean() |> round(2)` years old. Among the female participants in this study, `r filter (mci_baseline_effective, sex == "female", apoe4 == "apoe4_carrier") |> nrow()/nrow(filter(mci_baseline_effective, sex == "female"))*100`% are APOE4 carriers.
 
 Import and clean amyloid dataset:
@@ -185,7 +178,7 @@ mci_amyloid =
 ```{r}
 mci = 
   inner_join(
-    mci_developed, mci_amyloid, by = "id"
+    mci_baseline_effective, mci_amyloid, by = "id"
   )
 ```
 
@@ -193,10 +186,25 @@ mci =
 str(mci)
 ```
 
+Check the unique participants in Baseline and Amyloid dataset:
+```{r}
+mci_distinct = mci |> 
+  distinct(id)
+
+baseline_unique = anti_join(mci_baseline_effective, mci_distinct, by = "id")
+
+amyloid_unique = anti_join(mci_amyloid, mci_distinct, by = "id")
+
+```
+
+In the Baseline dataset, there are `r nrow(baseline_unique)` participants who only appear in the Baseline dataset. In the Amyloid dataset, there are `r nrow(amyloid_unique)/4` participants who only appear in the Amyloid dataset. 
+
 Based on the two datasets, there are `r mci |> distinct(id) |> nrow()` participants who appear in both datasets. In the `mci` dataset, participants who appear in both datasets are presented with their age, sex, aducaiton, and apoe4 status. Furthermore, each time when the bio-marker is measured is presented under the time variable and the specific time frame which each data was collected is labeled under the time_of_data_collected variable. 
 
 Exporting `mci` dataframe to the data folder:
 ```{r}
 write_csv(mci, "data/mci_combined.csv")
 ```
+
+
 
